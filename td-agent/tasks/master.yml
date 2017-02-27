@@ -1,0 +1,25 @@
+---
+- name: install package on master
+  apt:
+    name: "{{item}}"
+  with_items:
+    - geoip-database-contrib
+    - build-essential
+    - libgeoip-dev
+- name: copy master config
+  copy:
+    src: master.conf
+    dest: /etc/td-agent/conf.d/master.conf
+  notify: restart td-agent
+- name: install plugins on master
+  gem:
+    name: "{{item}}"
+    executable: /opt/td-agent/embedded/bin/gem
+    state: latest
+    user_install: no
+  with_items:
+    - fluent-plugin-elasticsearch
+    - fluent-plugin-geoip
+    - fluent-plugin-record-modifier
+  notify: restart td-agent
+# vim: set sts=2 sw=2:

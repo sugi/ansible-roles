@@ -1,0 +1,5 @@
+network.host: 0
+cluster.name: osdn
+node.name: ${HOSTNAME}
+discovery.zen.ping.unicast.hosts: ["es-01", "es-02"]
+index.codec: best_compression

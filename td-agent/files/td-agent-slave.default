@@ -1,0 +1,6 @@
+# This file is sourced by /bin/sh from /etc/init.d/td-agent
+# Options to pass to td-agent
+TD_AGENT_OPTIONS=""
+
+ionice -c3 -p$$
+renice -n 10 -p $$ > /dev/null

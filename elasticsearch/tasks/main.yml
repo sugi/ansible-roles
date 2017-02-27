@@ -1,0 +1,55 @@
+---
+- name: install base packages
+  apt:
+    name: "{{item}}"
+  with_items:
+    - apt-transport-https
+    - iptables-persistent
+    - openjdk-8-jre-headless
+- name: set elasticsearch apt key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    id: D88E42B4
+- name: add elasticsaerch apt repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+    update_cache: yes
+    #filename: "elastic-5.x" # only support in 2.1
+- name: apply iptables rule
+  shell: |
+    if ! (iptables -n -L INPUT | grep "tcp dpt:5601" |grep -q DROP); then
+      iptables -A INPUT '!' -s 10.231.0.1 -i eth0 -p tcp --dport 5601 -j DROP
+    fi
+    if ! (iptables -n -L INPUT | grep "tcp dpt:9200" |grep -q DROP); then
+      iptables -A INPUT '!' -s 10.231.0.0/27 -i eth0 -p tcp --dport 9200 -j DROP
+      iptables -A INPUT '!' -s 10.231.0.0/27 -i eth0 -p tcp --dport 9300:9400 -j DROP
+    fi
+- name: install elastic packages
+  apt:
+    name: "{{item}}"
+  with_items:
+    - elasticsearch
+    - kibana
+- name: set elasticsaech config
+  copy:
+    src: elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+    mode: 0660
+    owner: root
+    group: elasticsearch
+- name: set kibana config
+  copy:
+    src: kibana.yml
+    dest: /etc/kibana/kibana.yml
+- name: enable and restart services
+  # NOTE: Do NOT use /etc/init.d/kibana! When you use the script, systemd cannot handle the service.
+  shell: |
+    if ! (systemctl status {{item}}.service | grep -q enabled); then
+      systemctl daemon-reload
+      systemctl enable {{item}}.service
+    fi
+    systemctl restart {{item}}.service
+  with_items:
+    - elasticsearch
+    - kibana
+# vim: set sts=2 sw=2:

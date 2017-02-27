@@ -1,0 +1,10 @@
+---
+- name: make sure to install python-apt
+  shell: |
+    if dpkg -l python-apt 2> /dev/null | egrep -q '^ii '; then
+      echo -n ok
+    else
+      apt-get -y install python-apt
+    fi
+  register: check_python_apt
+  changed_when: check_python_apt.stdout != "ok"

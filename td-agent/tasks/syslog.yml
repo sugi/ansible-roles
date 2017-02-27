@@ -1,0 +1,26 @@
+---
+- name: check syslog agent
+  shell: |
+    if (dpkg -l syslog-ng 2>/dev/null | egrep -q '^ii '); then 
+      echo -n "syslog-ng"
+    elif (dpkg -l rsyslog 2>/dev/null | egrep -q '^ii '); then
+      echo -n 'rsyslog'
+    else
+      echo "Failed to find syslog agent" >&2
+      exit 255
+    fi
+  register: syslog_agent
+  changed_when: false
+- name: set syslog to forward to td-agent (rsyslog)
+  copy:
+    src: rsyslog-forward-fluent.conf
+    dest: /etc/rsyslog.d/forward-fluent.conf
+  when: syslog_agent.stdout == "rsyslog"
+  notify: restart rsyslog
+- name: set syslog to forward to td-agent (syslog-ng)
+  copy:
+    src: syslogng-forward-fluent.conf
+    dest: /etc/syslog-ng/conf.d/forward-fluent.conf
+  when: syslog_agent.stdout == "syslog-ng"
+  notify: restart syslog-ng
+# vim: set sts=2 sw=2:

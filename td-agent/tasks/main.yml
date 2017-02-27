@@ -1,0 +1,57 @@
+---
+- name: set apt key
+  apt_key:
+    url: http://packages.treasuredata.com/GPG-KEY-td-agent
+- name: set multiarch
+  shell: |
+    if (dpkg --print-foreign-architectures | grep -q amd64 && dpkg -l libc6:amd64 | egrep -q '^ii'); then
+      echo -n "ntd"
+    else
+      dpkg --add-architecture amd64
+      apt-get update
+      apt-get install -y libc6:amd64
+    fi
+  register: check_amd64_multiarch
+  changed_when: check_amd64_multiarch.stdout != "ntd"
+  when: ansible_userspace_architecture == 'i386'
+- name: set apt repository
+  apt_repository:
+    repo: deb [arch=amd64] http://packages.treasuredata.com/2/debian/{{ ansible_distribution_release|lower }}/ {{ ansible_distribution_release|lower }} contrib
+- name: install td-agent
+  apt:
+    name: td-agent{{':amd64' if ansible_userspace_architecture == 'i386' else ''}}
+- name: copy main config
+  copy:
+    src: td-agent.conf
+    dest: /etc/td-agent/td-agent.conf
+  notify: restart td-agent
+- name: make conf.d
+  file:
+    path: /etc/td-agent/conf.d
+    state: directory
+- name: make /var/lib/td-agent
+  file:
+    path: /var/lib/td-agent
+    owner: td-agent
+    state: directory
+- include: master.yml
+  when: use_rule_master
+- include: clients.yml
+  when: use_rule_client
+- name: add blinky forward rule
+  copy:
+    src: blinky-forward.conf
+    dest: /etc/td-agent/conf.d/blinky-forward.conf
+  notify: restart td-agent
+  when: use_rule_blinky_forward
+- name: copy syslog config to td-agent
+  copy:
+    src: syslog.conf
+    dest: /etc/td-agent/conf.d/syslog.conf
+  notify: restart td-agent
+- include: syslog.yml
+- name: ensure to start td-agent
+  service:
+    name: td-agent
+    state: started
+# vim: set sts=2 sw=2:

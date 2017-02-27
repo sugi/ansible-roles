@@ -1,0 +1,21 @@
+---
+- name: copy forward to master config
+  copy:
+    src: forward.conf
+    dest: /etc/td-agent/conf.d/z90-forward.conf
+  notify: restart td-agent
+- name: copy td-agent default file
+  copy:
+    src: td-agent-slave.default
+    dest: /etc/default/td-agent
+  notify: restart td-agent
+- name: install plugins on client
+  gem:
+    name: "{{item}}"
+    executable: /opt/td-agent/embedded/bin/gem
+    state: latest
+    user_install: no
+  with_items:
+    - fluent-plugin-secure-forward
+  notify: restart td-agent
+# vim: set sts=2 sw=2:

@@ -1,0 +1,9 @@
+{{target_dir}}/shared/log/*.log {
+        weekly
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        su {{app}} {{app}}
+        copytruncate
+}

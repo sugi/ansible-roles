@@ -1,0 +1,3 @@
+server.basePath: "/kibana"
+server.host: '0'
+logging.quiet: true

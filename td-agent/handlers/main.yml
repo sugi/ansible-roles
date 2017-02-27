@@ -1,0 +1,15 @@
+---
+- name: restart td-agent
+  service:
+    name: td-agent
+    state: restarted
+    enabled: yes
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+- name: restart syslog-ng
+  service:
+    name: syslog-ng
+    state: restarted
+# vim: set sts=2 sw=2:

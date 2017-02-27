@@ -1,0 +1,15 @@
+default: &default
+  adapter: mysql2
+  encoding: {{db_charset}}
+  pool: 5
+{% if db_host == "localhost" %}
+  socket: {{db_sock}}
+{% else %}
+  host: {{db_host}}
+{% endif %}
+
+{{rails_env}}:
+  <<: *default
+  database: "{{app}}"
+  username: "{{app}}"
+  password: "{{lookup('password', 'vars/'+app+'.mysqlpass')}}"

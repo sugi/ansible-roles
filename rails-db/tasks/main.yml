@@ -1,0 +1,31 @@
+---
+- name: install packges
+  apt: name={{item}}
+  with_items:
+    - mysql-server
+  when:
+    - not (item == "mysql-server" and not use_mysql)
+- name: create app datagbase
+  shell: |
+    if (echo 'show databases' | mysql --defaults-file=/etc/mysql/debian.cnf \
+      | grep -q {{app}}); then
+      echo -n ok
+    else
+      mysqladmin --defaults-file=/etc/mysql/debian.cnf --default-character-set={{db_charset}} create {{app}}
+    fi
+  when: use_mysql
+  register: chk_app_database
+  changed_when: chk_app_database.stdout != 'ok'
+- name: create app database user
+  shell: |
+    if (echo "select * from user where user = '{{app}}'" \
+      | mysql --defaults-file=/etc/mysql/debian.cnf mysql \
+      | grep -q {{app}}); then
+      echo -n ok
+    else
+      echo "grant all on \`{{app}}\`.* to '{{app}}'@'{{db_client_pat}}' identified by '{{lookup('password', playbook_dir+'/vars/'+app+'.mysqlpass')}}'" \
+      | mysql --defaults-file=/etc/mysql/debian.cnf
+    fi
+  when: use_mysql
+  register: chk_app_db_grant
+  changed_when: chk_app_db_grant.stdout != 'ok'

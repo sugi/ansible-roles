@@ -1,0 +1,50 @@
+---
+- name: install packges
+  apt: name={{item}}
+  with_items:
+    - libmysqlclient-dev
+    - git
+    - libicu-dev # for charlock_holmes
+    - imagemagick # for paperclip (with minimagick)
+  when:
+    - not (item == "libmysqlclient-dev" and not use_mysql)
+    - not (item == "libicu-dev" and not use_icu)
+    - not (item == "imagemagick" and not use_imagemagick)
+    - not (item == "git" and not use_git)
+- name: create service group
+  group: name={{app}} system=yes 
+- name: create service user
+  user: name={{app}} shell=/bin/bash group={{app}} home={{target_dir}} system=yes 
+- name: push ssh auth key 
+  authorized_key:
+    user: "{{app}}"
+    key: "{{item}}"
+  with_items: "{{ssh_keys}}"
+- name: create app shared path
+  file: path={{target_dir}}/shared state=directory owner={{app}} group={{app}}
+- name: create app shared config path
+  file: path={{target_dir}}/shared/config/initializers state=directory
+- name: touch shared/config/initializers/z90_local.rb
+  copy: dest={{target_dir}}/shared/config/initializers/z90_local.rb force=no content='# local config' mode=0644
+- name: create database config
+  template: src=database.yml.j2 dest={{target_dir}}/shared/config/database.yml owner={{app}} group={{app}} mode=0640 force=no
+  when: use_mysql
+- name: create secrets config
+  template: src=secrets.yml.j2 dest={{target_dir}}/shared/config/secrets.yml owner={{app}} group={{app}} mode=0640 force=no
+- name: create logrotate config
+  template: src=logrotate.j2 dest=/etc/logrotate.d/rails-{{app}} owner=root group=root mode=0644 force=no
+- name: create apache2 config
+  template: src=vhost.conf.j2 dest=/etc/apache2/sites-available/{{app}}.conf owner=root group=root mode=0644 force=no
+  when: use_apache
+- name: create apache log dir
+  file: path=/var/log/apache2/{{app}} state=directory
+  when: use_apache
+- name: enable apache2 site
+  command: /usr/sbin/a2ensite {{app}}.conf
+  args:
+    creates: /etc/apache2/sites-enabled/{{app}}.conf
+  when: use_apache
+  notify: restart apache2
+- name: add setting for rotate apache logs
+  lineinfile: dest=/etc/logrotate.d/apache2 regexp='^/var/log/apache2/\*\.log {' line='/var/log/apache2/*.log /var/log/apache2/*/*.log {' backrefs='yes'
+  when: use_apache
