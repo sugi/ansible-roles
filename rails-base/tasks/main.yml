@@ -6,13 +6,18 @@
     - ruby
     - ruby-dev
     - build-essential
-    - apache2-threaded-dev
     - zlib1g-dev
     - libcurl4-openssl-dev
+- name: install apache packages
+  apt: name={{item}}
+  with_items:
+    - apache2-threaded-dev
+    - apache2-dev
     - apache2
-   #- mysql-server
   when: 
-    - not ((item == "apache2" or item == "apache2-threaded-dev") and not use_apache)
+    - use_apache
+    - item == "apache2-threaded-dev" and ansible_distribution_release == "wheezy"
+    - item == "apache2-dev" and ansible_distribution_release == "wheezy"
 - name: install bundler gem
   gem:
     name: bundler
