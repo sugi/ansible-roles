@@ -8,3 +8,60 @@
     fi
   register: check_python_apt
   changed_when: check_python_apt.stdout != "ok"
+- name: add arege apt key
+  apt_key:
+    url: http://arege.jp/debian-arege/keys.gpg
+  when: use_apt_upchk
+- name: add apt-upchk repository
+  apt_repository:
+    repo: "deb http://ftp.arege.jp/debian-arege stable apt-upchk"
+- name: install base packages
+  apt:
+    name: "{{item}}"
+  with_items:
+    - locales-all
+    - ntp
+    - ntpdate
+    - apt-transport-https
+    - ca-certificates
+- name: add apt-upchk
+  apt:
+    name: apt-upchk
+  when: use_apt_upchk
+- name: change sshd port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: "Port {{change_sshd_port if change_sshd_port and change_sshd_port != True else 2022}}"
+    regexp: '^Port\s+\d+$'
+  when: change_sshd_port
+  notify: restart sshd
+- name: install unattended upgrade
+  apt:
+    name: "{{item}}"
+  with_items:
+    - unattended-upgrades
+    - apt-listchanges
+  when: use_unattended_upgrade
+- name: set upgrade packages to all
+  blockinfile:
+    insertafter: '^Unattended-Upgrade::Origins-Pattern {'
+    marker: '// {mark} ANSIBLE MANAGED BLOCK'
+    block: |
+      "o=Debian,n={{ansible_distribution_release}}";
+      "o=Debian,n={{ansible_distribution_release}}-updates";
+      "o=Debian,n={{ansible_distribution_release}}-proposed-updates";
+      "o=Debian,n={{ansible_distribution_release}},l=Debian-Security";
+      "o=Debian Backports,n={{ansible_distribution_release}}-backports,l=Debian Backports";
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+  when: use_unattended_upgrade
+- name: set send mail when upgraded
+  lineinfile:
+    regexp: '^/?/?Unattended-Upgrade::Mail "'
+    line: 'Unattended-Upgrade::Mail "root";'
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+  when: use_unattended_upgrade
+- name: enable unattended upgrade
+  copy:
+    src: 20auto-upgrades
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+  when: use_unattended_upgrade
