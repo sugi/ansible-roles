@@ -28,6 +28,7 @@
   copy: dest={{target_dir}}/shared/config/initializers/z90_local.rb force=no content='# local config' mode=0644
 - name: create shared/config/mongoid.yml
   template: src=mongoid.yml.j2 dest={{target_dir}}/shared/config/mongoid.yml force=no mode=0640 owner={{app}} group={{app}}
+  when: use_mongoid
 - name: create database config
   template: src=database.yml.j2 dest={{target_dir}}/shared/config/database.yml owner={{app}} group={{app}} mode=0640 force=no
   when: use_mysql
