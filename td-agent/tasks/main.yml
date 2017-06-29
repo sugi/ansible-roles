@@ -16,7 +16,7 @@
   when: ansible_userspace_architecture == 'i386'
 - name: set apt repository
   apt_repository:
-    repo: deb [arch=amd64] http://packages.treasuredata.com/2/debian/{{ ansible_distribution_release|lower }}/ {{ ansible_distribution_release|lower }} contrib
+    repo: deb [arch=amd64] http://packages.treasuredata.com/2/debian/{{ ansible_distribution_release if ansible_distribution_release != "strech" else 'jessie'  |lower }}/ {{ ansible_distribution_release if ansible_distribution_release != "strech" else 'jessie' |lower }} contrib
 - name: install td-agent
   apt:
     name: td-agent{{':amd64' if ansible_userspace_architecture == 'i386' else ''}}
