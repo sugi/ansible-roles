@@ -2,12 +2,12 @@
 - name: install packges
   apt: name={{item}}
   with_items:
-    - libmysqlclient-dev
+    - "{{'default-libmysqlclient-dev' if ansible_distribution_release == 'stretch' else 'libmysqlclient-dev'}}"
     - git
     - libicu-dev # for charlock_holmes
     - imagemagick # for paperclip (with minimagick)
   when:
-    - not (item == "libmysqlclient-dev" and not use_mysql)
+    - not ((item == "libmysqlclient-dev" or item == "default-libmysqlclient-dev") and not use_mysql)
     - not (item == "libicu-dev" and not use_icu)
     - not (item == "imagemagick" and not use_imagemagick)
     - not (item == "git" and not use_git)
