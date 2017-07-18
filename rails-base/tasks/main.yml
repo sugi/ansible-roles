@@ -97,3 +97,19 @@
     - procps
     - zlib1g-dev
   when: use_rvm or use_rvm_depends
+- name: add yarn apt key
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+  when: use_yarn
+- name: install apt https transport
+  apt:
+    name: apt-transport-https
+  when: use_yarn
+- name: add yarn apt line
+  apt_repository:
+    repo: 'deb https://dl.yarnpkg.com/debian/ stable main'
+  when: use_yarn
+- name: install yarn
+  apt:
+    name: yarn
+  when: use_yarn
