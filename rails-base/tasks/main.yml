@@ -113,3 +113,8 @@
   apt:
     name: yarn
   when: use_yarn
+- name: setup nodejs original package repository
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+    shell: curl -sL https://deb.nodesource.com/setup_6.x | bash -
+  when: use_node
