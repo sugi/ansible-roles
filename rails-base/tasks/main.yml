@@ -118,3 +118,7 @@
     creates: /etc/apt/sources.list.d/nodesource.list
     shell: curl -sL https://deb.nodesource.com/setup_6.x | bash -
   when: use_node
+- name: install node
+  apt:
+    name: nodejs
+  when: use_node
