@@ -1,0 +1,31 @@
+---
+- name: install nginx-full
+  apt:
+    name: nginx-full
+- name: remove defualt site
+  file:
+    state: absent
+    dest: /etc/nginx/sites-enabled/default
+  notify: restart nginx
+- name: add proxy site conf
+  copy:
+    src: proxy.conf
+    dest: /etc/nginx/sites-available/proxy.conf
+  notify: restart nginx
+- name: enable proxy site
+  file:
+    src: ../sites-available/proxy.conf
+    dest: /etc/nginx/sites-enabled/proxy.conf
+    state: link
+  notify: restart nginx
+- name: add blinky site conf
+  copy:
+    src: blinky.conf
+    dest: /etc/nginx/sites-available/blinky.conf
+  notify: restart nginx
+- name: enable blinky site
+  file:
+    src: ../sites-available/blinky.conf
+    dest: /etc/nginx/sites-enabled/blinky.conf
+    state: link
+  notify: restart nginx
