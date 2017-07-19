@@ -4,3 +4,8 @@
     name: ssh
     enabled: true
     state: restarted
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    enabled: true
+    state: restarted

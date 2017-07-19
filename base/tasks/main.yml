@@ -35,33 +35,27 @@
     regexp: '^Port\s+\d+$'
   when: change_sshd_port
   notify: restart sshd
-- name: install unattended upgrade
-  apt:
-    name: "{{item}}"
-  with_items:
-    - unattended-upgrades
-    - apt-listchanges
-  when: use_unattended_upgrade
-- name: set upgrade packages to all
-  blockinfile:
-    insertafter: '^Unattended-Upgrade::Origins-Pattern {'
-    marker: '// {mark} ANSIBLE MANAGED BLOCK'
-    block: |
-      "o=Debian,n={{ansible_distribution_release}}";
-      "o=Debian,n={{ansible_distribution_release}}-updates";
-      "o=Debian,n={{ansible_distribution_release}}-proposed-updates";
-      "o=Debian,n={{ansible_distribution_release}},l=Debian-Security";
-      "o=Debian Backports,n={{ansible_distribution_release}}-backports,l=Debian Backports";
-    dest: /etc/apt/apt.conf.d/50unattended-upgrades
-  when: use_unattended_upgrade
-- name: set send mail when upgraded
-  lineinfile:
-    regexp: '^/?/?Unattended-Upgrade::Mail "'
-    line: 'Unattended-Upgrade::Mail "root";'
-    dest: /etc/apt/apt.conf.d/50unattended-upgrades
-  when: use_unattended_upgrade
-- name: enable unattended upgrade
+- name: send syslog *.err /var/log/errors
   copy:
-    src: 20auto-upgrades
-    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    src: rsyslog-errors.conf
+    dest: /etc/rsyslog.d/errors.conf
+  notify: restart rsyslog
+- name: exclude local.* from /var/log/syslog
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: "*.*;local0,local1,local2,local3,local4,local5,local6,local7,auth,authpriv.none	-/var/log/syslog"
+    regexp: '^\*\.\*;\S+\s+-/var/log/syslog'
+  notify: restart rsyslog
+- name: add logrotate rule for /var/log/errors
+  copy:
+    src: logrotate.errors
+    dest: /etc/logrotate.d/syslog-errors
+- name: install logcheck
+  apt:
+    name: logcheck
+- name: set logcheck logfiles
+  copy:
+    src: logcheck.logfiles
+    dest: /etc/logcheck/logcheck.logfiles
+- include: unattended_upgrade.yml
   when: use_unattended_upgrade

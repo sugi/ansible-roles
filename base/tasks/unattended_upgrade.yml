@@ -1,0 +1,27 @@
+---
+- name: install unattended upgrade
+  apt:
+    name: "{{item}}"
+  with_items:
+    - unattended-upgrades
+    - apt-listchanges
+- name: set upgrade packages to all
+  blockinfile:
+    insertafter: '^Unattended-Upgrade::Origins-Pattern {'
+    marker: '// {mark} ANSIBLE MANAGED BLOCK'
+    block: |
+      "o=Debian,n={{ansible_distribution_release}}";
+      "o=Debian,n={{ansible_distribution_release}}-updates";
+      "o=Debian,n={{ansible_distribution_release}}-proposed-updates";
+      "o=Debian,n={{ansible_distribution_release}},l=Debian-Security";
+      "o=Debian Backports,n={{ansible_distribution_release}}-backports,l=Debian Backports";
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+- name: set send mail when upgraded
+  lineinfile:
+    regexp: '^/?/?Unattended-Upgrade::Mail "'
+    line: 'Unattended-Upgrade::Mail "root";'
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+- name: enable unattended upgrade
+  copy:
+    src: 20auto-upgrades
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
