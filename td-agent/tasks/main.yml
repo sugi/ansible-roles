@@ -50,6 +50,11 @@
     dest: /etc/td-agent/conf.d/syslog.conf
   notify: restart td-agent
 - include: syslog.yml
+- name: add td-agent user to adm group
+  user:
+    append: yes
+    name: td-agent
+    groups: adm
 - name: ensure to start td-agent
   service:
     name: td-agent
