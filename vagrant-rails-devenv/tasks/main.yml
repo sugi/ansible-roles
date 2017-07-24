@@ -1,0 +1,77 @@
+---
+- name: install packges
+  apt: name={{item}}
+  with_items:
+    - "{{'default-libmysqlclient-dev' if ansible_distribution_release == 'stretch' else 'libmysqlclient-dev'}}"
+    - git
+    - libicu-dev # for charlock_holmes
+    - imagemagick # for paperclip (with minimagick)
+    - libsqlite3-dev
+    - lv
+    - locales-all
+    - bash-completion
+    - vim
+  when:
+    - not ((item == "libmysqlclient-dev" or item == "default-libmysqlclient-dev") and not use_mysql)
+    - not (item == "libicu-dev" and not use_icu)
+    - not (item == "imagemagick" and not use_imagemagick)
+    - not (item == "git" and not use_git)
+    - not (item == "libsqlite3-dev" and not use_sqlite)
+- name: copy shell environment file
+  copy:
+    src: shell-env
+    dest: /home/vagrant/.env
+  become: False
+- name: source .env from .bash_profile
+  lineinfile:
+    dest: /home/vagrant/.bash_profile
+    line: 'source ~/.env'
+    regexp: '^source ~/\.env'
+    create: yes
+  become: False
+- name: set auto cd to /vagrant
+  lineinfile:
+    dest: /home/vagrant/.bash_profile
+    line: 'tty -s && cd /vagrant'
+    regexp: '^tty -s && cd /vagrant'
+    create: yes
+  become: False
+- include: rvm.yml
+  when: use_rvm
+  become: False
+- include: nvm.yml
+  when: use_nvm
+  become: False
+- name: run bundler to install gems
+  shell: bash -lc bundle
+  args: 
+    chdir: /vagrant
+  become: False
+- name: set irbrc
+  copy:
+    src: irbrc
+    dest: /home/vagrant/.irbrc
+  become: False
+- name: set pryrc
+  copy:
+    src: pryrc
+    dest: /home/vagrant/.pryrc
+  become: False
+- name: install foreman
+  shell: bash -lc 'gem install --no-ri --no-rdoc foreman'
+  become: False
+  args:
+    creates: /home/vagrant/gems/bin/foreman
+  when: use_foreman
+- name: run yarn (with nvm)
+  shell: bash -lc 'NODE_VERSION=default ~/.nvm/nvm-exec yarn'
+  args: 
+    chdir: /vagrant
+  when: use_yarn and use_nvm
+  become: False
+- name: run yarn (without nvm)
+  shell: yarn
+  args: 
+    chdir: /vagrant
+  when: use_yarn and not use_nvm
+  become: False
