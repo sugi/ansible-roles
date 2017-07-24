@@ -1,10 +1,8 @@
 ---
-- name: install packges
-  apt: name={{item}}
-  with_items:
-    - mysql-server
-  when:
-    - not (item == "mysql-server" and not use_mysql)
+- name: install mysql server packge
+  apt:
+    name: mysql-server
+  when: use_mysql
 - name: create app datagbase
   shell: |
     if (echo 'show databases' | mysql --defaults-file=/etc/mysql/debian.cnf \
@@ -16,6 +14,14 @@
   when: use_mysql
   register: chk_app_database
   changed_when: chk_app_database.stdout != 'ok'
+- name: set tunning (YOU NEED RESTART mysqld MANUALLY!)
+  copy:
+    src: "{{item}}"
+    dest: "/etc/mysql/conf.d/{{item}}"
+  with_items:
+    - inndb-format.cnf
+    - charset.cnf
+  when: use_mysql
 - name: create app database user
   shell: |
     if (echo "select * from user where user = '{{app}}'" \
