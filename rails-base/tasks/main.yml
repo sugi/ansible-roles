@@ -11,7 +11,6 @@
 - name: install apache packages
   apt: name={{item}}
   with_items:
-    - "{{'apache2-threaded-dev' if ansible_distribution_release == 'wheezy' else 'apache2-dev'}}"
     - apache2
   when: 
     - use_apache
@@ -20,43 +19,16 @@
     name: bundler
     user_install: no
     pre_release: no
-- name: install rack gem (depends by passenger)
-  gem:
-    name: rack
-    user_install: no
-    pre_release: no
-    version: 1.6.5
-  when: use_passenger and ansible_distribution_release in ["jessie", "wheezy"]
-- name: install libssl-dev to build passenger
+- name: install passenger for apache
   apt:
-    name: libssl-dev
-  when: use_passenger and ansible_distribution_release in ["stretch"]
-- name: install passenger gem
-  gem:
-    name: passenger
-    user_install: no
-    pre_release: no
-  when: use_passenger
-- name: install apache2 passenger module
-  args:
-  shell: |
-    if find /var/lib/gems/*/gems/passenger-* -name mod_passenger.so | egrep -q '.so$'; then
-      echo -n 'ok'
-    else
-      /usr/local/bin/passenger-install-apache2-module -a
-      find /var/lib/gems/*/gems/passenger-* -name mod_passenger.so | egrep -q '.so$'
-    fi
-  register: chk_mod_passenger
-  when: use_passenger and use_apache
-  changed_when: chk_mod_passenger.stdout != 'ok'
-- name: create passenger module config
-  args:
-    creates: /etc/apache2/mods-available/passenger.load
-  shell: |
-    echo 'LoadModule passenger_module '`ls /var/lib/gems/*/gems/passenger-*/buildout/apache2/mod_passenger.so |tail -1` > /etc/apache2/mods-available/passenger.load; \
-    echo 'PassengerRoot '`ls -d /var/lib/gems/*/gems/passenger-* |tail -1` > /etc/apache2/mods-available/passenger.conf; \
-    echo 'PassengerDefaultRuby '`gem env | grep 'RUBY EXECUTABLE:' | awk '{print $4}'` >> /etc/apache2/mods-available/passenger.conf; \
-    echo 'PassengerEnabled off' >> /etc/apache2/mods-available/passenger.conf
+    name: libapache2-mod-passenger
+  when: use_apache and use_passenger
+- name: disable passenger on default
+  lineinfile:
+    dest: /etc/apache2/mods-available/passenger.conf
+    insertbefore: '^</IfModule>'
+    regexp: '^\s*PassengerEnabled '
+    line: '  PassengerEnabled off'
   when: use_passenger and use_apache
   notify: restart apache2
 - name: enable passenger module
@@ -114,9 +86,9 @@
     name: yarn
   when: use_yarn
 - name: setup nodejs original package repository
+  shell: 'wget -O- -q https://deb.nodesource.com/setup_6.x | bash -'
   args:
     creates: /etc/apt/sources.list.d/nodesource.list
-    shell: curl -sL https://deb.nodesource.com/setup_6.x | bash -
   when: use_node
 - name: install node
   apt:
