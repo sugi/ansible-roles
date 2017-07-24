@@ -1,0 +1,55 @@
+---
+- name: install cockroachdb binary
+  unarchive:
+    dest: /usr/local
+    creates: /usr/local/cockroach-v1.0.3.linux-amd64/cockroach
+    remote_src: yes
+    src: https://binaries.cockroachdb.com/cockroach-v1.0.3.linux-amd64.tgz
+- name: symlink cockroachdb binary to /usr/local/bin
+  file:
+    state: link
+    dest: /usr/local/bin/cockroach
+    src: /usr/local/cockroach-v1.0.3.linux-amd64/cockroach
+- name: copy cockroachdb service file
+  copy:
+    src: cockroachdb.service
+    dest: /etc/systemd/system/cockroachdb.service
+- name: copy cockroachdb default file
+  copy:
+    src: cockroachdb.default
+    dest: /etc/default/cockroachdb
+    force: no
+- name: create cockroachdb system group
+  group:
+    name: cockroach
+    system: yes
+- name: create cockroachdb system user
+  user:
+    name: cockroach
+    group: cockroach
+    shell: /usr/sbin/nologin
+    home: /etc/cockroach
+    createhome: no
+    system: yes
+- name: create cockroachdb etc dir
+  file:
+    state: directory
+    dest: /etc/cockroach
+    owner: root
+    group: root
+- name: create cockroachdb data dir
+  file:
+    state: directory
+    dest: /var/lib/cockroach
+    owner: cockroach
+    group: cockroach
+    mode: 0750
+- name: create cockroachdb log dir
+  file:
+    state: directory
+    dest: /var/log/cockroach
+    owner: cockroach
+    group: adm
+    mode: 0750
+- name: reload systemd daemon file
+  shell: systemctl daemon-reload

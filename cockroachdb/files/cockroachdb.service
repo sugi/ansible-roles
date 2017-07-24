@@ -1,0 +1,16 @@
+[Unit]
+Description = CockroachDB service
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+Alias=cockroach.service
+
+[Service]
+User=cockroach
+Group=cockroach
+Restart=on-failure
+EnvironmentFile=-/etc/default/cockroachdb
+ExecStart=/usr/local/bin/cockroach start $COCKROACH_DEFAULT_OPTIONS $COCKROACH_START_OPTIONS
+ExecStop=/usr/local/bin/cockroach quit $COCKROACH_DEFAULT_OPTIONS
+LimitNOFILE=35000

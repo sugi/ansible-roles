@@ -1,0 +1,5 @@
+# Set --certs-dir=/etc/cockroach/certs or --insecure to share with start and quit.
+COCKROACH_DEFAULT_OPTIONS=""
+
+# Options for start command.
+COCKROACH_START_OPTIONS="--log-dir /var/log/cockroach --store=/var/lib/cockroach --http-host 127.0.0.1"
