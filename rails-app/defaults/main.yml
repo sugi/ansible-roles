@@ -12,6 +12,7 @@ use_rvm: False
 use_rvm_depends: False
 use_mongoid: False
 use_node: False
+use_yarn: False
 db_charset: utf8
 db_host: localhost
 db_sock: /var/run/mysqld/mysqld.sock
