@@ -1,0 +1,39 @@
+---
+- name: install depends package
+  apt:
+    name: "{{item}}"
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+- name: add docker apt key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+- name: add docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ansible_distribution_release | lower }} stable"
+- name: remove old docker package
+  apt:
+    name: "{{item}}"
+    state: absent
+  with_items:
+    - docker-engine
+    - docker.io
+    - docker
+- name: install docker
+  apt: name=docker-ce
+- name: mkdir /var/log/docker
+  file:
+    state: directory
+    dest: /var/log/docker
+    mode: 0750
+    owner: root
+    group: adm
+- name: add container log (local1) to /var/log/docker/container.log
+  copy:
+    src: docker-container.rsyslog
+    dest: /etc/rsyslog.d/docker-container.conf
+  notify: restart rsyslog
+- name: add logrotate setting for /var/log/docker
+  copy:
+    src: docker.logrotate
+    dest: /etc/logrotate.d/docker
