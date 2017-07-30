@@ -2,5 +2,5 @@ export PATH=$HOME/bin:/home/vagrant/gems/bin:$PATH
 export TRUSTED_IP="${SSH_CLIENT%% *}"
 export GEM_HOME=/home/vagrant/gems
 export LV='-c'
-export LESS='-r'
+export LESS='-R'
 export PAGER=lv
