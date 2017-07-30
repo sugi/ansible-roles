@@ -1,0 +1,12 @@
+[INCLUDES]
+# Read common prefixes. If any customizations available -- read them from
+# common.local
+before = common.conf
+
+[Definition]
+
+_daemon = sshd
+
+failregex = ^%(__prefix_line)sReceived disconnect from <HOST>:.*\[preauth\]$
+
+ignoreregex = 

@@ -2,3 +2,4 @@
 use_apt_upchk: no
 change_sshd_port: 2022
 use_unattended_upgrade: no
+use_fail2ban: yes

@@ -59,3 +59,7 @@
     dest: /etc/logcheck/logcheck.logfiles
 - include: unattended_upgrade.yml
   when: use_unattended_upgrade
+- include: fail2ban.yml
+  when: use_fail2ban
+- include: docker.yml
+  when: use_docker
