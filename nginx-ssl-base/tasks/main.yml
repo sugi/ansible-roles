@@ -1,0 +1,6 @@
+---
+- name: set ssl base setting
+  copy:
+    src: ssl.conf
+    dest: /etc/nginx/conf.d/ssl.conf
+  notify: reload nginx
