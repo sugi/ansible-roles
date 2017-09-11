@@ -1,8 +1,8 @@
-[ssh-prove]
+[ssh-probe]
 enabled = true
 bantime = 7200
 findtime = 3600
 maxretry = 10
 port = {{change_sshd_port if change_sshd_port and change_sshd_port != True else 2022}}
 logpath = /var/log/auth.log
-filter = sshd-prove
+filter = sshd-probe

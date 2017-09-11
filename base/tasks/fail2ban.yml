@@ -7,7 +7,7 @@
     src: "f2b-filter.{{item}}"
     dest: "/etc/fail2ban/filter.d/{{item}}.local"
   with_items:
-    - sshd-prove
+    - sshd-probe
   notify: restart fail2ban
 - name: copy jail rules
   template:
@@ -16,7 +16,7 @@
   with_items:
     - postfix
     - sshd-ddos
-    - sshd-prove
+    - sshd-probe
     - sshd
     - ignore
   notify: restart fail2ban
