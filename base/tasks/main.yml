@@ -57,6 +57,10 @@
   copy:
     src: logcheck.logfiles
     dest: /etc/logcheck/logcheck.logfiles
+- name: copy base logcheck ignore
+  copy:
+    src: logcheck.ignore
+    dest: /etc/logcheck/ignore.d.server/nemui-base
 - include: unattended_upgrade.yml
   when: use_unattended_upgrade
 - include: fail2ban.yml
