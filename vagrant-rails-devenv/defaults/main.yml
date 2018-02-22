@@ -9,3 +9,5 @@ use_rvm: False
 use_rvm_depends: False
 rvm_ruby_version: 2.3
 use_foreman: False
+use_nvm: False
+use_yarn: False
