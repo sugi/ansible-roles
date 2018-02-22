@@ -14,7 +14,7 @@
   when: use_apt_upchk
 - name: add apt-upchk repository
   apt_repository:
-    repo: "deb http://ftp.arege.jp/debian-arege stable apt-upchk"
+    repo: "deb http://ftp.arege.jp/debian-arege {{ansible_distribution_release}} apt-upchk"
 - name: install base packages
   apt:
     name: "{{item}}"
