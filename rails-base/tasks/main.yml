@@ -84,6 +84,7 @@
 - name: install yarn
   apt:
     name: yarn
+    state: latest
   when: use_yarn
 - name: setup nodejs original package repository
   shell: 'wget -O- -q https://deb.nodesource.com/setup_6.x | bash -'
@@ -93,4 +94,5 @@
 - name: install node
   apt:
     name: nodejs
+    state: latest
   when: use_node
