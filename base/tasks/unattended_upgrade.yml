@@ -10,11 +10,11 @@
     insertafter: '^Unattended-Upgrade::Origins-Pattern {'
     marker: '// {mark} ANSIBLE MANAGED BLOCK'
     block: |
-      "o=Debian,n={{ansible_distribution_release}}";
-      "o=Debian,n={{ansible_distribution_release}}-updates";
-      "o=Debian,n={{ansible_distribution_release}}-proposed-updates";
-      "o=Debian,n={{ansible_distribution_release}},l=Debian-Security";
-      "o=Debian Backports,n={{ansible_distribution_release}}-backports,l=Debian Backports";
+      "o=Debian,n=${distro_codename}-updates";
+      "o=Debian,n=${distro_codename}-proposed-updates";
+      "o=Debian,n=${distro_codename},label=Debian";
+      "o=Debian,n=${distro_codename},label=Debian-Security";
+      "o=Debian Backports,n=${distro_codename}-backports,l=Debian Backports";
     dest: /etc/apt/apt.conf.d/50unattended-upgrades
 - name: set send mail when upgraded
   lineinfile:
