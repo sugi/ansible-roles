@@ -21,7 +21,7 @@
   with_items:
     - inndb-format.cnf
     - charset.cnf
-  when: use_mysql
+  when: use_mysql and use_mysql_tune
 - name: create app database user
   shell: |
     if (echo "select * from user where user = '{{app}}'" \
