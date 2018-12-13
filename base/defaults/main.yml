@@ -1,6 +1,6 @@
 ---
-use_apt_upchk: no
+use_apt_upchk: yes
 change_sshd_port: 2022
-use_unattended_upgrade: no
-use_fail2ban: yes
+use_unattended_upgrade: yes
+use_fail2ban: no
 use_docker: no
