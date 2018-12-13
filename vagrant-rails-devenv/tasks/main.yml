@@ -71,7 +71,7 @@
     regexp: '^tty -s && cd /vagrant'
     create: yes
   become: False
-  when: vboxsf.stdout == 'yes'
+  when: wsl.stdout != 'yes'
 - name: make ~vagrant/bin
   file:
     dest: "{{ansible_env.HOME}}/bin"
@@ -97,7 +97,7 @@
   args: 
     chdir: /vagrant
   become: False
-  when: vboxsf.stdout == 'yes'
+  when: wsl.stdout != 'yes'
 - name: install foreman
   shell: bash -lc 'gem install --no-ri --no-rdoc foreman'
   become: False
@@ -121,11 +121,11 @@
   shell: bash -lc 'NODE_VERSION=default ~/.nvm/nvm-exec yarn'
   args: 
     chdir: /vagrant
-  when: vboxsf.stdout == 'yes' and use_yarn and use_nvm
+  when: wsl.stdout != 'yes' and use_yarn and use_nvm
   become: False
 - name: run yarn (without nvm)
   shell: yarn
   args: 
     chdir: /vagrant
-  when: vboxsf.stdout == 'yes' and use_yarn and not use_nvm
+  when: wsl.stdout != 'yes' and use_yarn and not use_nvm
   become: False
