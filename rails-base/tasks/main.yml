@@ -22,6 +22,17 @@
     name: bundler
     user_install: no
     pre_release: no
+- name: create apache systemd drop-in dir
+  file:
+    dest: /etc/systemd/system/apache2.service.d
+    state: directory
+  when: use_passenger and use_apache
+- name: create drop-in config for PassengerInstanceRegistryDir
+  copy:
+    dest: /etc/systemd/system/apache2.service.d/set-passenger-registry-dir.conf
+    src: set-passenger-registry-dir.conf
+  notify: systemctl daemon-reload
+  when: use_passenger and use_apache
 - name: install passenger for apache
   apt:
     name: libapache2-mod-passenger
@@ -32,6 +43,14 @@
     insertbefore: '^</IfModule>'
     regexp: '^\s*PassengerEnabled '
     line: '  PassengerEnabled off'
+  when: use_passenger and use_apache
+  notify: restart apache2
+- name: Set PassengerInstanceRegistryDir to outside private tmp
+  lineinfile:
+    dest: /etc/apache2/mods-available/passenger.conf
+    insertbefore: '^</IfModule>'
+    regexp: '^\s*PassengerInstanceRegistryDir '
+    line: '  PassengerInstanceRegistryDir /var/run/passenger-instreg'
   when: use_passenger and use_apache
   notify: restart apache2
 - name: enable passenger module

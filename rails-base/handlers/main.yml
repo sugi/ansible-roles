@@ -3,3 +3,5 @@
   service:
     name: apache2
     state: restarted
+- name: systemctl daemon-reload
+  shell: sudo systemctl daemon-reload
