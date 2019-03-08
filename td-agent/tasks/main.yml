@@ -35,15 +35,9 @@
     owner: td-agent
     state: directory
 - include: master.yml
-  when: use_rule_master
+  when: use_tdagent_rule_master
 - include: clients.yml
-  when: use_rule_client
-- name: add blinky forward rule
-  copy:
-    src: blinky-forward.conf
-    dest: /etc/td-agent/conf.d/blinky-forward.conf
-  notify: restart td-agent
-  when: use_rule_blinky_forward
+  when: use_tdagent_rule_client
 - name: copy syslog config to td-agent
   copy:
     src: syslog.conf

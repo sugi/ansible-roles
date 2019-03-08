@@ -1,4 +1,4 @@
-<VirtualHost *:80>
+<VirtualHost *:{{apache_http_port}}>
     ServerName {{server_name}}
     DocumentRoot {{target_dir}}/current/public
     CustomLog /var/log/apache2/{{app}}/access.log combined

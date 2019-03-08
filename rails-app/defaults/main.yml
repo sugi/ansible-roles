@@ -21,3 +21,4 @@ db_sock: /var/run/mysqld/mysqld.sock
 db_client_pat: localhost
 ssh_keys:
   - https://github.com/sugi.keys
+apache_http_port: 80
