@@ -1,10 +1,9 @@
 ---
 - name: install unattended upgrade
   apt:
-    name: "{{item}}"
-  with_items:
-    - unattended-upgrades
-    - apt-listchanges
+    name:
+      - unattended-upgrades
+      - apt-listchanges
 - name: set upgrade packages to all
   blockinfile:
     insertafter: '^Unattended-Upgrade::Origins-Pattern {'

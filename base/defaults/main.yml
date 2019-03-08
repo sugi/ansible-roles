@@ -4,3 +4,4 @@ change_sshd_port: 2022
 use_unattended_upgrade: yes
 use_fail2ban: no
 use_docker: no
+use_dsck: yes

@@ -11,24 +11,31 @@
 - name: add arege apt key
   apt_key:
     url: http://arege.jp/debian-arege/keys.gpg
-  when: use_apt_upchk
+  when: use_apt_upchk or use_dsck
 - name: add apt-upchk repository
   apt_repository:
     repo: "deb http://ftp.arege.jp/debian-arege {{ansible_distribution_release}} apt-upchk"
   when: use_apt_upchk
+- name: add dsck repository
+  apt_repository:
+    repo: "deb http://ftp.arege.jp/debian-arege {{ansible_distribution_release}} dsck"
+  when: use_dsck
 - name: install base packages
   apt:
-    name: "{{item}}"
-  with_items:
-    - locales-all
-    - ntp
-    - ntpdate
-    - apt-transport-https
-    - ca-certificates
+    name:
+      - locales-all
+      - ntp
+      - ntpdate
+      - apt-transport-https
+      - ca-certificates
 - name: add apt-upchk
   apt:
     name: apt-upchk
   when: use_apt_upchk
+- name: add dsck
+  apt:
+    name: dsck
+  when: use_dsck
 - name: change sshd port
   lineinfile:
     dest: /etc/ssh/sshd_config

@@ -1,10 +1,9 @@
 ---
 - name: install depends package
   apt:
-    name: "{{item}}"
-  with_items:
-    - apt-transport-https
-    - ca-certificates
+    name:
+      - apt-transport-https
+      - ca-certificates
 - name: add docker apt key
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
@@ -13,14 +12,14 @@
     repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ansible_distribution_release | lower }} stable"
 - name: remove old docker package
   apt:
-    name: "{{item}}"
+    name:
+      - docker-engine
+      - docker.io
+      - docker
     state: absent
-  with_items:
-    - docker-engine
-    - docker.io
-    - docker
 - name: install docker
-  apt: name=docker-ce
+  apt:
+    name: docker-ce
 - name: mkdir /var/log/docker
   file:
     state: directory

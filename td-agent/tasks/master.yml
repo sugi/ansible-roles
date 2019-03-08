@@ -1,11 +1,10 @@
 ---
 - name: install package on master
   apt:
-    name: "{{item}}"
-  with_items:
-    - geoip-database-contrib
-    - build-essential
-    - libgeoip-dev
+    name:
+      - geoip-database-contrib
+      - build-essential
+      - libgeoip-dev
 - name: copy master config
   copy:
     src: master.conf
