@@ -1,0 +1,35 @@
+---
+- name: prepare nginx conf dir
+  file: 
+    dest: /etc/nginx/conf.d
+    state: directory
+  when: has_nginx
+- name: prepare apache conf available dir
+  file:
+    dest:  /etc/apache2/conf-available
+    state: directory
+  when: has_apache
+- name: prepare apache conf enabled dir
+  file:
+    dest:  /etc/apache2/conf-enabled
+    state: directory
+  when: has_apache
+- name: copy ltsv setting for nginx
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/conf.d/ltsv.conf
+  notify: reload nginx
+  when: has_nginx
+- name: copy ltsv setting for apache
+  copy:
+    src: apache.conf
+    dest: /etc/apache2/conf-available/ltsv.conf
+  notify: reload apache
+  when: has_apache
+- name: enable ltsv setting on apache
+  file:
+    src: ../conf-available/ltsv.conf
+    dest: /etc/apache2/conf-enabled/ltsv.conf
+    state: link
+  notify: reload apache
+  when: has_apache
