@@ -1,3 +1,4 @@
 ---
 dependencies:
-  - role: nginx-ssl-bases
+  - role: nginx-ssl-base
+  - role: use-ltsv

@@ -4,3 +4,7 @@
     name: nginx
     enabled: true
     state: restarted
+- name: restart td-agent
+  service:
+    name: td-agent
+    state: restarted
