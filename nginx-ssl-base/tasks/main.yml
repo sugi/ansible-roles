@@ -1,4 +1,8 @@
 ---
+- name: prepare nginx conf dir
+  file:
+    dest: /etc/nginx/conf.d
+    state: directory
 - name: set ssl base setting
   copy:
     src: ssl.conf
