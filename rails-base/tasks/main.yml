@@ -22,6 +22,8 @@
     name: bundler
     user_install: no
     pre_release: no
+    version: "{{bundler_version}}"
+  when: use_bundler_by_gem
 - name: create apache systemd drop-in dir
   file:
     dest: /etc/systemd/system/apache2.service.d
