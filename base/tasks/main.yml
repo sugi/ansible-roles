@@ -6,6 +6,8 @@
     else
       apt-get -y install python-apt
     fi
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   register: check_python_apt
   changed_when: check_python_apt.stdout != "ok"
 - name: add arege apt key
