@@ -5,6 +5,8 @@
       - locales-all
       - ruby
       - ruby-dev
+      - autoconf
+      - libtool
       - build-essential
       - zlib1g-dev
       - libcurl4-openssl-dev
