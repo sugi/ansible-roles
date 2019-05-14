@@ -29,6 +29,14 @@
     dest: /etc/nginx/sites-enabled/blinky.conf
     state: link
   notify: restart nginx
+- name: install procps
+  apt:
+    name: procps
+- name: tcp tune
+  copy:
+    src: 90-tcp-backlog-tune.conf
+    dest: /etc/sysctl.d/90-tcp-backlog-tune.conf
+  notify: apply sysctl
 - name: prepare td-agent conf.d
   file:
     dest:  /etc/td-agent/conf.d

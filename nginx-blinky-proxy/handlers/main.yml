@@ -8,3 +8,5 @@
   service:
     name: td-agent
     state: restarted
+- name: apply sysctl
+  shell: sysctl -p /etc/sysctl.d/*.conf
