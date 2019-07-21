@@ -12,5 +12,5 @@
   shell: "bash -lc 'rvm use {{rvm_ruby_version}} --default'" 
   become: False
 - name: install bundler into rvm
-  shell: "bash -lc 'gem install bundler --no-rdoc --no-ri'"
+  shell: "bash -lc 'gem install bundler'"
   become: False

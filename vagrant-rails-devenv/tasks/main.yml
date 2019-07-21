@@ -99,7 +99,7 @@
   become: False
   when: wsl.stdout != 'yes'
 - name: install foreman
-  shell: bash -lc 'gem install --no-ri --no-rdoc foreman'
+  shell: bash -lc 'gem install foreman'
   become: False
   args:
     creates: "{{ansible_env.HOME}}/gems/bin/foreman"
