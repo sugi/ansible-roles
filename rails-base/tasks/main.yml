@@ -113,8 +113,6 @@
   when: use_yarn
 - name: setup nodejs original package repository
   shell: 'wget -O- -q https://deb.nodesource.com/setup_11.x | bash -'
-  args:
-    creates: /etc/apt/sources.list.d/nodesource.list
   when: use_node
 - name: install node
   apt:
