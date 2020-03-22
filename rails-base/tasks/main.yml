@@ -112,7 +112,7 @@
     state: latest
   when: use_yarn
 - name: setup nodejs original package repository
-  shell: 'wget -O- -q https://deb.nodesource.com/setup_11.x | bash -'
+  shell: 'wget -O- -q https://deb.nodesource.com/setup_12.x | bash -'
   when: use_node
 - name: install node
   apt:
