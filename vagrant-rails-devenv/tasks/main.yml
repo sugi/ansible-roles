@@ -25,7 +25,7 @@
 - name: install packges
   apt: name={{item}}
   with_items:
-    - "{{'default-libmysqlclient-dev' if ansible_distribution_release == 'stretch' else 'libmysqlclient-dev'}}"
+    - "{{'default-libmysqlclient-dev' if ansible_distribution_version == 'unstable' or ansible_distribution_version | float >= 9 else 'libmysqlclient-dev'}}"
     - git
     - libicu-dev # for charlock_holmes
     - imagemagick # for paperclip (with minimagick)
